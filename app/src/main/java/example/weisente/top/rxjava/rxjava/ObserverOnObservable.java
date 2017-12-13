@@ -29,7 +29,6 @@ public class ObserverOnObservable<T> extends Observable<T> {
             this.schedulers = schedulers;
         }
 
-
         @Override
         public void onSubscribe() {
             observer.onSubscribe();
@@ -53,6 +52,7 @@ public class ObserverOnObservable<T> extends Observable<T> {
 
         @Override
         public void run() {
+            // 主线程 或者 其他
             observer.onNext(value);
         }
     }

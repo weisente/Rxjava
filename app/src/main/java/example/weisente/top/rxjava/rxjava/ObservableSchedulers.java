@@ -7,6 +7,7 @@ package example.weisente.top.rxjava.rxjava;
 public class ObservableSchedulers<T> extends Observable<T>  {
     final Observable<T> source;
     final Schedulers schedulers;
+
     public ObservableSchedulers(Observable<T> source, Schedulers schedulers) {
         this.source = source;
         this.schedulers = schedulers;
