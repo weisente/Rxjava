@@ -1,17 +1,15 @@
 package example.weisente.top.rxjava.rxjava;
 
-import io.reactivex.annotations.NonNull;
+import android.support.annotation.NonNull;
 
 /**
  * Created by san on 2017/12/13.
- * 给观测者的一系列的操作
+ * 定义每一个关卡 所需要的处理
  */
 
 public interface Observer<T> {
-
     void onSubscribe();
     void onNext(@NonNull T item);
-    void onError(@NonNull Throwable e); // 一个异常
+    void onError(@NonNull Throwable e);
     void onComplete();
-
 }

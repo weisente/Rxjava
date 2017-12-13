@@ -15,11 +15,12 @@ public class ObservableJust<T> extends Observable<T> {
 
     @Override
     protected void subscribeActual(Observer<T> observer) {
-        ScalarDisposable sd = new ScalarDisposable(observer,item);
-        observer.onSubscribe();//第一步
-        sd.run();
-    }
 
+        ScalarDisposable sd = new ScalarDisposable(observer,item);
+        observer.onSubscribe();
+        sd.run();
+
+    }
     private class ScalarDisposable<T>{
         private Observer observer;
         private T item;
@@ -31,6 +32,7 @@ public class ObservableJust<T> extends Observable<T> {
 
         public void run(){
             try {
+                // 3.第三步 observer -> MapObserver.onNext(String)
                 observer.onNext(item);
                 observer.onComplete();
             }catch (Exception e){
@@ -38,4 +40,5 @@ public class ObservableJust<T> extends Observable<T> {
             }
         }
     }
+
 }

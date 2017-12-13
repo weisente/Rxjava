@@ -31,30 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         mImage = (ImageView) findViewById(R.id.image);
         Log.e("特别","？？");
-//        Observable.just("urlxxx")
-//                .subscribe(new Observer<String>() {
-//
-//                    @Override
-//                    public void onSubscribe() {
-//                        Log.e("TAG","onSubscribe");
-//                    }
-//
-//                    @Override
-//                    public void onNext(@NonNull String s) {
-//                        Log.e("TAG","onNext = "+s);
-//                        Integer.parseInt("xx");
-//                    }
-//
-//                    @Override
-//                    public void onError(@NonNull Throwable e) {
-//                        Log.e("TAG","onError");
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//                        Log.e("TAG","onComplete");
-//                    }
-//                });
 
         new Thread(new Runnable() {
             @Override
@@ -62,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 Observable.just("http://img.taopic.com/uploads/allimg/130331/240460-13033106243430.jpg")
                         .map(new Function<String, Bitmap>() {
                             @Override
-                            public Bitmap apply(String urlPath) throws Exception {
+                            public Bitmap apply(String urlPath)  throws Exception{
                                 // 第五步
                                 URL url = new URL(urlPath);
                                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
