@@ -18,6 +18,7 @@ import java.net.URL;
 import example.weisente.top.rxjava.rxjava.Consumer;
 import example.weisente.top.rxjava.rxjava.Function;
 import example.weisente.top.rxjava.rxjava.Observable;
+import example.weisente.top.rxjava.rxjava.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,50 +33,41 @@ public class MainActivity extends AppCompatActivity {
         mImage = (ImageView) findViewById(R.id.image);
         Log.e("特别","？？");
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Observable.just("http://img.taopic.com/uploads/allimg/130331/240460-13033106243430.jpg")
-                        .map(new Function<String, Bitmap>() {
-                            @Override
-                            public Bitmap apply(String urlPath)  throws Exception{
-                                // 第五步
-                                URL url = new URL(urlPath);
-                                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                                InputStream inputStream = urlConnection.getInputStream();
-                                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                return bitmap;
-                            }
-                        })
-                        .map(new Function<Bitmap, Bitmap>() {
-                            @Override
-                            public Bitmap apply(@NonNull Bitmap bitmap) throws Exception {
-                                bitmap = createWatermark(bitmap, "RxJava2.0");
-                                return bitmap;
-                            }
-                        })
-                        .map(new Function<Bitmap, Bitmap>() {
-                            @Override
-                            public Bitmap apply(Bitmap bitmap) throws Exception {
-                                return bitmap;
-                            }
-                        })
-
-                        .subscribe(new Consumer<Bitmap>() {
-                            @Override
-                            public void onNext(final Bitmap bitmap) {
-                                // 第七步
-                                Log.e("TAG", "item = " + bitmap);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mImage.setImageBitmap(bitmap);
-                                    }
-                                });
-                            }
-                        });
-            }
-        }).start();
+        Observable.just("http://img.taopic.com/uploads/allimg/130331/240460-13033106243430.jpg")// ObservableJust
+                .map(new Function<String, Bitmap>() { // 事件变换 // ObservableMap  source -> ObservableJust
+                    @Override
+                    public Bitmap apply(@NonNull String urlPath) throws Exception {
+                        Log.e("apply1", Thread.currentThread().getName());
+                        URL url = new URL(urlPath);
+                        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                        InputStream inputStream = urlConnection.getInputStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        return bitmap;
+                    }
+                })
+                .map(new Function<Bitmap, Bitmap>() { // ObservableMap
+                    @Override
+                    public Bitmap apply(@NonNull Bitmap bitmap) throws Exception {
+                        bitmap = createWatermark(bitmap, "RxJava2.0");
+                        return bitmap;
+                    }
+                })
+                .map(new Function<Bitmap, Bitmap>() {
+                    @Override
+                    public Bitmap apply(Bitmap bitmap) throws Exception {
+                        Log.e("apply2", Thread.currentThread().getName());
+                        return bitmap;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observerOn(Schedulers.mainThread())
+                .subscribe(new Consumer<Bitmap>() { // ObservableMap
+                    @Override
+                    public void onNext(Bitmap bitmap) throws Exception {
+                        Log.e("onNext", Thread.currentThread().getName());// 子线程 or 主线程 ？ 1 2
+                        mImage.setImageBitmap(bitmap);
+                    }
+                });
     }
 
     private Bitmap createWatermark(Bitmap bitmap, String mark) {

@@ -1,5 +1,7 @@
 package example.weisente.top.rxjava.rxjava;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by san on 2017/12/13.
  */
@@ -43,8 +45,16 @@ public abstract class Observable<T> implements ObservableSource<T> {
     public  void subscribe(Consumer<T> onNext){
         subscribe(onNext,null,null);
     }
+
     private void subscribe(Consumer<T> onNext, Consumer<T> error, Consumer<T> complete) {
         subscribe(new LambdaObserver<T>(onNext));
+    }
+    //添加切换线程的功能
+    public Observable<Bitmap> subscribeOn(Schedulers schedulers) {
+        return onAssembly(new ObservableSchedulers(this,schedulers));
+    }
+    public Observable<T> observerOn(Schedulers schedulers) {
+        return onAssembly(new ObserverOnObservable(this,schedulers));
     }
 
 }

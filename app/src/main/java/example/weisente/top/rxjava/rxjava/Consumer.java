@@ -5,5 +5,5 @@ package example.weisente.top.rxjava.rxjava;
  */
 
 public interface Consumer<T> {
-    void onNext(T item) ;
+    void onNext(T item) throws Exception;
 }
