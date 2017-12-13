@@ -1,17 +1,23 @@
 package example.weisente.top.rxjava;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import example.weisente.top.rxjava.rxjava.Consumer;
+import example.weisente.top.rxjava.rxjava.Function;
 import example.weisente.top.rxjava.rxjava.Observable;
-import example.weisente.top.rxjava.rxjava.Observer;
-import io.reactivex.annotations.NonNull;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,30 +31,75 @@ public class MainActivity extends AppCompatActivity {
 
         mImage = (ImageView) findViewById(R.id.image);
         Log.e("特别","？？");
-        Observable.just("urlxxx")
-                .subscribe(new Observer<String>() {
+//        Observable.just("urlxxx")
+//                .subscribe(new Observer<String>() {
+//
+//                    @Override
+//                    public void onSubscribe() {
+//                        Log.e("TAG","onSubscribe");
+//                    }
+//
+//                    @Override
+//                    public void onNext(@NonNull String s) {
+//                        Log.e("TAG","onNext = "+s);
+//                        Integer.parseInt("xx");
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull Throwable e) {
+//                        Log.e("TAG","onError");
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e("TAG","onComplete");
+//                    }
+//                });
 
-                    @Override
-                    public void onSubscribe() {
-                        Log.e("TAG","onSubscribe");
-                    }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Observable.just("http://img.taopic.com/uploads/allimg/130331/240460-13033106243430.jpg")
+                        .map(new Function<String, Bitmap>() {
+                            @Override
+                            public Bitmap apply(String urlPath) throws Exception {
+                                // 第五步
+                                URL url = new URL(urlPath);
+                                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                                InputStream inputStream = urlConnection.getInputStream();
+                                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                return bitmap;
+                            }
+                        })
+                        .map(new Function<Bitmap, Bitmap>() {
+                            @Override
+                            public Bitmap apply(@NonNull Bitmap bitmap) throws Exception {
+                                bitmap = createWatermark(bitmap, "RxJava2.0");
+                                return bitmap;
+                            }
+                        })
+                        .map(new Function<Bitmap, Bitmap>() {
+                            @Override
+                            public Bitmap apply(Bitmap bitmap) throws Exception {
+                                return bitmap;
+                            }
+                        })
 
-                    @Override
-                    public void onNext(@NonNull String s) {
-                        Log.e("TAG","onNext = "+s);
-                        Integer.parseInt("xx");
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        Log.e("TAG","onError");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e("TAG","onComplete");
-                    }
-                });
+                        .subscribe(new Consumer<Bitmap>() {
+                            @Override
+                            public void onNext(final Bitmap bitmap) {
+                                // 第七步
+                                Log.e("TAG", "item = " + bitmap);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mImage.setImageBitmap(bitmap);
+                                    }
+                                });
+                            }
+                        });
+            }
+        }).start();
     }
 
     private Bitmap createWatermark(Bitmap bitmap, String mark) {
